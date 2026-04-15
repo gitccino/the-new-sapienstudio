@@ -10,7 +10,7 @@ export default async function AuthLayout({
   if (authed) redirect("/");
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="min-h-dvh bt w-full max-md:px-[5%] mx-auto flex items-center justify-center">
       {children}
     </div>
   );

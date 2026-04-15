@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as functions_credits from "../functions/credits.js";
 import type * as http from "../http.js";
 import type * as task from "../task.js";
 
@@ -18,6 +19,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  "functions/credits": typeof functions_credits;
   http: typeof http;
   task: typeof task;
 }>;

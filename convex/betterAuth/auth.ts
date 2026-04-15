@@ -20,8 +20,9 @@ export const authComponent = createClient<DataModel, typeof schema>(
 // Better Auth Options
 export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
   return {
-    appName: "My App",
+    appName: "Sapienstudio",
     baseURL: process.env.SITE_URL,
+    trustedOrigins: [process.env.SITE_URL!].filter(Boolean),
     secret: process.env.BETTER_AUTH_SECRET,
     database: authComponent.adapter(ctx),
     emailAndPassword: {

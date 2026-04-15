@@ -2,13 +2,57 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
+@font-face {
+  font-family: "Marlin Soft SQ";
+  src: url("https://fonts-cdn.gitccino.com/marlin-soft/marlin-soft-sq-400.woff2")
+    format("woff2");
+  font-weight: 400;
+  font-display: normal;
+}
+@font-face {
+  font-family: "Marlin Soft SQ";
+  src: url("https://fonts-cdn.gitccino.com/marlin-soft/marlin-soft-sq-500.woff2")
+    format("woff2");
+  font-weight: 500;
+  font-display: normal;
+}
+@font-face {
+  font-family: "Marlin Soft SQ";
+  src: url("https://fonts-cdn.gitccino.com/marlin-soft/marlin-soft-sq-700.woff2")
+    format("woff2");
+  font-weight: 700;
+  font-display: normal;
+}
+@font-face {
+  font-family: "Marlin Soft SQ";
+  src: url("https://fonts-cdn.gitccino.com/marlin-soft/marlin-soft-sq-800.woff2")
+    format("woff2");
+  font-weight: 800;
+  font-display: normal;
+}
+@font-face {
+  font-family: "Marlin Soft SQ";
+  src: url("https://fonts-cdn.gitccino.com/marlin-soft/marlin-soft-sq-900.woff2")
+    format("woff2");
+  font-weight: 900;
+  font-display: normal;
+}
+
+@font-face {
+  font-family: "MonoLisa";
+  src: url("https://fonts-cdn.gitccino.com/monolisa/monolisa-400.woff2")
+    format("woff2");
+  font-weight: 400;
+  font-display: normal;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-marlin);
+  --font-mono: var(--font-monolisa);
   --font-heading: var(--font-sans);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -46,19 +90,29 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+
+  --color-splitter: var(--splitter);
+  --color-splitter-card: var(--splitter-card);
+  --color-secondary-button: var(--secondary-button);
+  --color-secondary-card-button: var(--secondary-card-button);
+  --color-credit: var(--credit);
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
+  --font-marlin: "Marlin Soft SQ", "Geist", sans-serif;
+  --font-monolisa: "MonoLisa", "Geist Mono", monospace;
+
+  --background: #fff;
+  --foreground: #535353;
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
+  --popover: #f5f5f5;
+  --popover-foreground: #535353;
+  /*--primary: oklch(0.205 0 0);*/
+  --primary: #272727;
+  --primary-foreground: #fff;
   --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
+  --secondary-foreground: #535353;
   --muted: oklch(0.97 0 0);
   --muted-foreground: oklch(0.556 0 0);
   --accent: oklch(0.97 0 0);
@@ -81,24 +135,29 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+
+  --splitter: #f5f5f5;
+  --splitter-card: #e5e5e5;
+  --secondary-button: #f5f5f5;
+  --secondary-card-button: #e5e5e5;
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
+  --background: #181a1d;
+  --foreground: #eff1f0;
   --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
+  --popover: #1e2024;
   --popover-foreground: oklch(0.985 0 0);
   --primary: oklch(0.922 0 0);
   --primary-foreground: oklch(0.205 0 0);
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
+  --muted-foreground: #8f8f91;
   --accent: oklch(0.269 0 0);
   --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
+  --destructive: #e55b5b;
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.556 0 0);
@@ -115,11 +174,19 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+
+  --splitter: #1e2024;
+  --splitter-card: #2a2d32;
+  --secondary-button: #1e2024;
+  --secondary-card-button: #2a2d32;
+  /*--secondary-button: #2a2d32;*/
+
+  --credit: #f2b45c;
 }
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply box-border border-border outline-ring/50;
   }
   body {
     @apply bg-background text-foreground;
@@ -127,4 +194,44 @@
   html {
     @apply font-sans;
   }
+}
+
+@utility flex-row-center {
+  @apply flex flex-row justify-center items-center;
+}
+@utility flex-col-center {
+  @apply flex flex-col justify-center items-center;
+}
+
+@utility flex-row-between {
+  @apply flex flex-row justify-between items-center;
+}
+
+@utility flex-row-start {
+  @apply flex flex-row justify-start items-start;
+}
+@utility flex-col-start {
+  @apply flex flex-col justify-start items-start;
+}
+
+@utility bt {
+  @apply border-[0.5px] border-foreground/20;
+}
+
+@utility main-container {
+  @apply max-w-3xl mx-auto w-full py-16 md:py-32 px-[5%] md:px-16;
+}
+
+/*@utility mask-to-t-light {
+  mask: linear-gradient(to top, #181a1d 0%, #181a1d 37%, #181a1d 100%);
+}*/
+
+/*(24, 26, 29, 1)*/
+@utility mask-to-t-light {
+  mask: linear-gradient(
+    to top,
+    rgba(24, 26, 29, 1) 0%,
+    rgba(24, 26, 29, 1) 17%,
+    rgba(24, 26, 29, 0) 100%
+  );
 }

@@ -1,34 +1,36 @@
 "use client";
 
-import { validateSignUp, type FieldErrors } from "@/actions/auth";
+import { validateSignUp } from "@/actions/auth";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
 export function SignUpForm() {
   const router = useRouter();
-  const [errors, setErrors] = useState<FieldErrors>({});
+  const [errors, setErrors] = useState<Record<string, string[] | undefined>>(
+    {},
+  );
   const [authError, setAuthError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
 
     startTransition(async () => {
       setAuthError(null);
 
-      // 1. Server-side Zod v4 validation
-      const errors = await validateSignUp(formData);
-
-      if (errors) {
-        setErrors(errors);
+      const fieldErrors = await validateSignUp(formData);
+      if (fieldErrors) {
+        setErrors(fieldErrors);
         return;
       }
 
       setErrors({});
 
-      // 2. Account created server-side in Convex via Better Auth
       const { error } = await authClient.signUp.email({
         name: formData.get("name") as string,
         email: formData.get("email") as string,
@@ -36,95 +38,106 @@ export function SignUpForm() {
       });
 
       if (error) {
-        setAuthError(error.message ?? "Could not create account. Try again.");
+        setAuthError(
+          error.message ??
+            "Something went wrong. Please try again or contact support.",
+        );
         return;
       }
 
-      router.push("/");
+      // router.push("/collections");
+      router.refresh();
     });
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-3" noValidate>
       <div className="space-y-1">
-        <label htmlFor="name" className="text-sm font-medium">
+        <Label htmlFor="name" className="mb-1 sr-only">
           Name
-        </label>
-        <input
+        </Label>
+        <Input
           id="name"
           name="name"
           type="text"
           autoComplete="name"
+          placeholder="John Doe"
+          defaultValue="Supitcha"
           required
-          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black disabled:opacity-50"
         />
         {errors.name && (
-          <p className="text-xs text-red-500">{errors.name[0]}</p>
+          <p className="text-xs text-destructive">{errors.name[0]}</p>
         )}
       </div>
 
       <div className="space-y-1">
-        <label htmlFor="email" className="text-sm font-medium">
-          Email
-        </label>
-        <input
+        <Label htmlFor="email" className="mb-1 sr-only">
+          Email Address
+        </Label>
+        <Input
           id="email"
           name="email"
           type="email"
-          autoComplete="email"
+          autoComplete="off"
+          placeholder="you@sapienstudio.com"
+          defaultValue="s@sapienstudio.com"
           required
-          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black disabled:opacity-50"
         />
         {errors.email && (
-          <p className="text-xs text-red-500">{errors.email[0]}</p>
+          <p className="text-xs text-destructive">{errors.email[0]}</p>
         )}
       </div>
 
       <div className="space-y-1">
-        <label htmlFor="password" className="text-sm font-medium">
+        <Label htmlFor="password" className="mb-1 sr-only">
           Password
-        </label>
-        <input
+        </Label>
+        <Input
           id="password"
           name="password"
           type="password"
           autoComplete="new-password"
+          placeholder="Password"
+          defaultValue="@f36SKSK"
           required
-          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black disabled:opacity-50"
         />
         {errors.password && (
-          <p className="text-xs text-red-500">{errors.password[0]}</p>
+          <p className="text-xs text-destructive">{errors.password[0]}</p>
         )}
       </div>
 
       <div className="space-y-1">
-        <label htmlFor="confirmPassword" className="text-sm font-medium">
-          Confirm password
-        </label>
-        <input
+        <Label htmlFor="confirmPassword" className="mb-1 sr-only">
+          Confirm Password
+        </Label>
+        <Input
           id="confirmPassword"
           name="confirmPassword"
           type="password"
           autoComplete="new-password"
+          placeholder="Confirm password"
+          defaultValue="@f36SKSK"
           required
-          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black disabled:opacity-50"
         />
         {errors.confirmPassword && (
-          <p className="text-xs text-red-500">{errors.confirmPassword[0]}</p>
+          <p className="text-xs text-destructive">
+            {errors.confirmPassword[0]}
+          </p>
         )}
       </div>
 
-      {authError && (
-        <p className="text-xs text-red-500">{authError}</p>
-      )}
-
-      <button
-        type="submit"
-        disabled={isPending}
-        className="w-full rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-50"
-      >
-        {isPending ? "Creating account…" : "Create account"}
-      </button>
+      <div className="space-y-1">
+        <Button
+          type="submit"
+          variant="secondaryCard"
+          disabled={isPending}
+          className="w-full"
+          size="2xl"
+        >
+          {isPending ? "Creating account…" : "Create account"}
+        </Button>
+        {authError && <p className="text-xs text-destructive">{authError}</p>}
+      </div>
     </form>
   );
 }

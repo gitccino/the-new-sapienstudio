@@ -1,13 +1,18 @@
 "use client";
 
-import { validateSignIn, type FieldErrors } from "@/actions/auth";
+import { validateSignIn } from "@/actions/auth";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
 export function SignInForm() {
   const router = useRouter();
-  const [errors, setErrors] = useState<FieldErrors>({});
+  const [errors, setErrors] = useState<Record<string, string[] | undefined>>(
+    {},
+  );
   const [authError, setAuthError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -18,17 +23,14 @@ export function SignInForm() {
     startTransition(async () => {
       setAuthError(null);
 
-      // 1. Server-side Zod v4 validation
-      const errors = await validateSignIn(formData);
-
-      if (errors) {
-        setErrors(errors);
+      const fieldErrors = await validateSignIn(formData);
+      if (fieldErrors) {
+        setErrors(fieldErrors);
         return;
       }
 
       setErrors({});
 
-      // 2. Credentials verified server-side in Convex via Better Auth
       const { error } = await authClient.signIn.email({
         email: formData.get("email") as string,
         password: formData.get("password") as string,
@@ -39,55 +41,61 @@ export function SignInForm() {
         return;
       }
 
-      router.push("/");
+      // router.push("/collections");
+      router.refresh();
     });
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-3" noValidate>
       <div className="space-y-1">
-        <label htmlFor="email" className="text-sm font-medium">
-          Email
-        </label>
-        <input
+        <Label htmlFor="email" className="mb-1 sr-only">
+          Email Address
+        </Label>
+        <Input
           id="email"
           name="email"
           type="email"
-          autoComplete="email"
+          autoComplete="off"
+          placeholder="you@sapienstudio.com"
+          defaultValue="s@sapienstudio.com"
           required
-          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black disabled:opacity-50"
         />
         {errors.email && (
-          <p className="text-xs text-red-500">{errors.email[0]}</p>
+          <p className="text-xs text-destructive">{errors.email[0]}</p>
         )}
       </div>
 
       <div className="space-y-1">
-        <label htmlFor="password" className="text-sm font-medium">
+        <Label htmlFor="password" className="mb-1 sr-only">
           Password
-        </label>
-        <input
+        </Label>
+        <Input
           id="password"
           name="password"
           type="password"
-          autoComplete="current-password"
+          autoComplete="off"
+          placeholder="Password"
+          defaultValue="@f36SKSK"
           required
-          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black disabled:opacity-50"
         />
         {errors.password && (
-          <p className="text-xs text-red-500">{errors.password[0]}</p>
+          <p className="text-xs text-destructive">{errors.password[0]}</p>
         )}
       </div>
 
-      {authError && <p className="text-xs text-red-500">{authError}</p>}
-
-      <button
-        type="submit"
-        disabled={isPending}
-        className="w-full rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-50"
-      >
-        {isPending ? "Signing in…" : "Sign in"}
-      </button>
+      <div className="space-y-1">
+        <Button
+          type="submit"
+          variant="secondaryCard"
+          disabled={isPending}
+          className="w-full"
+          size="2xl"
+        >
+          {isPending ? "Signing in…" : "Sign in"}
+        </Button>
+        {authError && <p className="text-xs text-destructive">{authError}</p>}
+      </div>
     </form>
   );
 }
