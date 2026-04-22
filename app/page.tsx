@@ -10,7 +10,7 @@ export default function Home() {
   const tasks = useQuery(api.task.get);
 
   React.useEffect(() => {
-    router.push("/components");
+    router.push("/collections");
   }, [router]);
 
   if (tasks === undefined)

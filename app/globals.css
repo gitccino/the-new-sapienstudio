@@ -96,6 +96,7 @@
   --color-secondary-button: var(--secondary-button);
   --color-secondary-card-button: var(--secondary-card-button);
   --color-credit: var(--credit);
+  --color-success: var(--success);
 }
 
 :root {
@@ -140,6 +141,9 @@
   --splitter-card: #e5e5e5;
   --secondary-button: #f5f5f5;
   --secondary-card-button: #e5e5e5;
+
+  --credit: #f2b45c;
+  --success: #a1c181;
 }
 
 .dark {
@@ -182,6 +186,7 @@
   /*--secondary-button: #2a2d32;*/
 
   --credit: #f2b45c;
+  --success: #a1c181;
 }
 
 @layer base {
@@ -219,7 +224,7 @@
 }
 
 @utility main-container {
-  @apply max-w-3xl mx-auto w-full py-16 md:py-32 px-[5%] md:px-16;
+  @apply max-w-3xl mx-auto w-full py-16 md:py-16 px-[5%] md:px-16;
 }
 
 /*@utility mask-to-t-light {

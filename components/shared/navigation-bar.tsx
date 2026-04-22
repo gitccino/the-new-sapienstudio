@@ -20,7 +20,7 @@ export default async function NavigationBar() {
   }
 
   return (
-    <div className="px-[5%] md:px-16 py-1.5 fixed h-fit left-0 right-0 flex-row-between max-w-3xl mx-auto">
+    <div className="px-[5%] md:px-16 py-3 fixed h-fit left-0 right-0 flex-row-between max-w-3xl mx-auto">
       <div>
         <CreditDialog />
       </div>

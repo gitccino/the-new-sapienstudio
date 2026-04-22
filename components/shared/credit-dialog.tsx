@@ -18,8 +18,15 @@ import { memo, useState } from "react";
 import { CREDIT_OPTIONS } from "@/constants/billing";
 import { cn } from "@/lib/utils";
 import { Splitter } from "./splitter";
-import { useQuery } from "convex/react";
+import { useAction, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
+
+import {
+  useQuery as useTQuery,
+  useMutation as useTMutation,
+} from "@tanstack/react-query";
+import { convexQuery, useConvexMutation } from "@convex-dev/react-query";
+import { PRODUCT_OPTIONS } from "@/convex/constants/payments";
 
 export default function CreditDialog() {
   const balanceResult = useQuery(api.functions.credits.getBalance);
@@ -56,7 +63,16 @@ export default function CreditDialog() {
 
 const BuyMoreCredits = memo(function BuyMoreCredits() {
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const selectedOption = CREDIT_OPTIONS[selectedIndex];
+  const selectedOption = PRODUCT_OPTIONS[selectedIndex];
+
+  const payWithStripe = useAction(api.payments.stripe.pay);
+  const handlePayWithStrip = async () => {
+    const paymentUrl = await payWithStripe({
+      prodId: selectedOption.lineItem.price_data.product,
+    });
+    if (paymentUrl) window.location.href = paymentUrl;
+  };
+
   return (
     <>
       <div className="flex flex-row justify-around gap-2">
@@ -81,26 +97,70 @@ const BuyMoreCredits = memo(function BuyMoreCredits() {
           </button>
         ))}
       </div>
-      <Button variant="secondaryCard" size="2xl" className="font-normal">
-        Buy {selectedOption.credit} credits
+      <Button
+        type="button"
+        variant="secondaryCard"
+        size="2xl"
+        className="font-normal"
+        onClick={handlePayWithStrip}
+      >
+        Buy {selectedOption.credits} credits
       </Button>
     </>
   );
 });
 
 const CreditDaily = memo(function CreditDaily() {
+  const { data: statusData, isPending: isLoadingStatus } = useTQuery(
+    convexQuery(api.functions.credits.getDailyClaimStatus),
+  );
+  const canClaim = statusData?.canClaim;
+
+  const {
+    data: claimData,
+    mutate: claimDailyReward,
+    isPending: isClaiming,
+  } = useTMutation({
+    mutationFn: useConvexMutation(api.functions.credits.claimDailyReward),
+  });
+  const isClaimSuccess = !claimData
+    ? null
+    : claimData.status === "success"
+      ? true
+      : false;
+
   return (
     <div>
       <Button
         variant="none"
         size="2xl"
-        className="w-full bg-credit text-secondary-button font-normal"
+        disabled={isLoadingStatus || canClaim === undefined || !canClaim}
+        className="w-full bg-credit text-foreground dark:text-secondary-button font-normal"
+        onClick={() => claimDailyReward({})}
       >
         <HugeiconsIcon icon={GiftIcon} />
-        Claim daily reward
+        {canClaim === undefined
+          ? "Loading claim status"
+          : !canClaim
+            ? "Already claimed"
+            : isClaiming
+              ? "Claiming reward..."
+              : "Claim daily reward"}
       </Button>
-      <span className="text-muted-foreground px-1 text-[.7rem]">
-        ** Check back daily to claim free credit
+      <span
+        className={cn(
+          "text-muted-foreground px-1 text-[.7rem]",
+          isClaimSuccess && "text-success",
+          isClaimSuccess === false && "text-destructive",
+        )}
+      >
+        {!claimData
+          ? "** Check back daily to claim free credit"
+          : claimData.status === "success"
+            ? claimData.message
+            : claimData.status === "already_claimed"
+              ? "Already claimed"
+              : "Something went wrong"}
       </span>
     </div>
   );
